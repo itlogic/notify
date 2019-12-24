@@ -1,0 +1,13 @@
+*.iml
+*.log
+.classpath
+.factorypath
+.m2
+.project
+.settings
+.swagger-codegen-ignore
+.vscode
+/.idea
+/out
+/target
+
