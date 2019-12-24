@@ -1,6 +1,6 @@
 ## Send notification to Telegram channel
 
-####Add maven repository
+#### Add maven repository
 ```xml
 <repositories>
     <repository>
