@@ -31,6 +31,8 @@ public class NotifyProvider {
         error
     }
 
+    private String channelId;
+
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     private ClientInterface client;
@@ -40,6 +42,7 @@ public class NotifyProvider {
             this.client = builder.client.newInstance();
             Preconditions.checkNotNull(builder.authKey);
             this.client.setAuth(builder.authKey);
+            this.channelId = (builder.channelId);
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -47,16 +50,24 @@ public class NotifyProvider {
         }
     }
 
-    public final void send(final Notify level, final String chat, final String title, final String message) {
+    public final void send(final Notify level, final String channel, final String title, final String message) {
+        pushMessageTask(level, channel, title, message);
+    }
+
+    public final void send(final Notify level, final String title, final String message) {
+        pushMessageTask(level, this.channelId, title, message);
+    }
+
+    private void pushMessageTask(final Notify level, final String channel, final String title, final String message) {
         switch (level) {
             case info:
-                executor.submit(new NotifyTask(client, chat, makeInfoMessage(title, message)));
+                executor.submit(new NotifyTask(client, channel, makeInfoMessage(title, message)));
                 break;
             case warning:
-                executor.submit(new NotifyTask(client, chat, makeWarningMessage(title, message)));
+                executor.submit(new NotifyTask(client, channel, makeWarningMessage(title, message)));
                 break;
             case error:
-                executor.submit(new NotifyTask(client, chat, makeErrorMessage(title, message)));
+                executor.submit(new NotifyTask(client, channel, makeErrorMessage(title, message)));
                 break;
             default:
                 break;
@@ -82,6 +93,7 @@ public class NotifyProvider {
 
         private Class<? extends ClientInterface> client;
         private String authKey;
+        private String channelId;
 
         public Builder(final Class<? extends ClientInterface> client) {
             this.client = client;
@@ -89,6 +101,11 @@ public class NotifyProvider {
 
         public final Builder auth(final String auth) {
             this.authKey = auth;
+            return this;
+        }
+
+        public final Builder channel(final String channelId) {
+            this.channelId = channelId;
             return this;
         }
 
