@@ -31,7 +31,8 @@ public class NotifyProvider {
         error
     }
 
-    private String channelId;
+    private String channelId = "";
+    private String title = "";
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
@@ -42,7 +43,8 @@ public class NotifyProvider {
             this.client = builder.client.newInstance();
             Preconditions.checkNotNull(builder.authKey);
             this.client.setAuth(builder.authKey);
-            this.channelId = (builder.channelId);
+            this.channelId = builder.channelId;
+            this.title = builder.title;
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -56,6 +58,10 @@ public class NotifyProvider {
 
     public final void send(final Notify level, final String title, final String message) {
         pushMessageTask(level, this.channelId, title, message);
+    }
+
+    public final void send(final Notify level, final String message) {
+        pushMessageTask(level, this.channelId, this.title, message);
     }
 
     private void pushMessageTask(final Notify level, final String channel, final String title, final String message) {
@@ -94,6 +100,7 @@ public class NotifyProvider {
         private Class<? extends ClientInterface> client;
         private String authKey;
         private String channelId;
+        private String title;
 
         public Builder(final Class<? extends ClientInterface> client) {
             this.client = client;
@@ -106,6 +113,11 @@ public class NotifyProvider {
 
         public final Builder channel(final String channelId) {
             this.channelId = channelId;
+            return this;
+        }
+
+        public final Builder title(final String title) {
+            this.title = title;
             return this;
         }
 
