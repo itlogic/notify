@@ -1,7 +1,6 @@
 package com.github.itlogic.notify;
 
 import com.github.itlogic.notify.clients.ClientInterface;
-import com.google.common.base.Preconditions;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,8 +30,8 @@ public class NotifyProvider {
         error
     }
 
-    private String channelId = "";
-    private String title = "";
+    private String channelId;
+    private String title;
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
@@ -41,7 +40,6 @@ public class NotifyProvider {
     public NotifyProvider(final Builder builder) {
         try {
             this.client = builder.client.newInstance();
-            Preconditions.checkNotNull(builder.authKey);
             this.client.setAuth(builder.authKey);
             this.channelId = builder.channelId;
             this.title = builder.title;
@@ -98,9 +96,9 @@ public class NotifyProvider {
     public static class Builder {
 
         private Class<? extends ClientInterface> client;
-        private String authKey;
-        private String channelId;
-        private String title;
+        private String authKey = "";
+        private String channelId = "";
+        private String title = "";
 
         public Builder(final Class<? extends ClientInterface> client) {
             this.client = client;
