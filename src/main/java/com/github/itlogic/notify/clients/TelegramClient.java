@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Telegram client impl.
+ */
 public class TelegramClient implements ClientInterface {
 
     private static final String TELEGRAM_API_URL = "https://api.telegram.org/bot";
@@ -21,12 +24,12 @@ public class TelegramClient implements ClientInterface {
     private String apiKey = "";
 
     @Override
-    public void setAuth(String authKey) {
+    public final void setAuth(final String authKey) {
         this.apiKey = authKey;
     }
 
     @Override
-    public void send(String chat, String message) throws NotifySendException {
+    public final void send(final String chat, final String message) throws NotifySendException {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost(makeUrl("sendMessage"));
         List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
@@ -44,7 +47,7 @@ public class TelegramClient implements ClientInterface {
         }
     }
 
-    private String makeUrl(String action) {
+    private String makeUrl(final String action) {
         return TELEGRAM_API_URL + apiKey + "/" + action;
     }
 }
