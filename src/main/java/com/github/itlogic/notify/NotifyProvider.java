@@ -1,6 +1,7 @@
 package com.github.itlogic.notify;
 
 import com.github.itlogic.notify.clients.ClientInterface;
+import com.google.common.base.Preconditions;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,8 +35,16 @@ public class NotifyProvider {
 
     private ClientInterface client;
 
-    public NotifyProvider(final ClientInterface client) {
-        this.client = client;
+    public NotifyProvider(final Builder builder) {
+        try {
+            this.client = builder.client.newInstance();
+            Preconditions.checkNotNull(builder.authKey);
+            this.client.setAuth(builder.authKey);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public final void send(final Notify level, final String chat, final String title, final String message) {
@@ -71,25 +80,20 @@ public class NotifyProvider {
      */
     public static class Builder {
 
-        private ClientInterface client;
+        private Class<? extends ClientInterface> client;
+        private String authKey;
 
         public Builder(final Class<? extends ClientInterface> client) {
-            try {
-                this.client = client.newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            this.client = client;
         }
 
-        public final Builder setAuth(final String auth) {
-            this.client.setAuth(auth);
+        public final Builder auth(final String auth) {
+            this.authKey = auth;
             return this;
         }
 
         public final NotifyProvider build() {
-            return new NotifyProvider(client);
+            return new NotifyProvider(this);
         }
     }
 }
