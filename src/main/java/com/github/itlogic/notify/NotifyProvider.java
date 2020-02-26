@@ -5,8 +5,6 @@ import com.github.itlogic.notify.exceptions.NotifyRequiredException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 
 /**
  * Notification provider.
@@ -16,7 +14,7 @@ public class NotifyProvider {
     private String channelId;
     private String title;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private ClientInterface client;
 
