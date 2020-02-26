@@ -1,7 +1,7 @@
 package com.github.itlogic.notify;
 
 import com.github.itlogic.notify.clients.ClientInterface;
-import com.github.itlogic.notify.clients.NotifySendException;
+import com.github.itlogic.notify.exceptions.NotifySendException;
 
 /**
  * Task. Send notification.

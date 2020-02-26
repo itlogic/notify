@@ -2,13 +2,24 @@
 
 #### Example
 ```java
-NotifyProvider notify = new NotifyProvider.Builder(TelegramClient.class)
-        .setAuth("telegram bot auth key")
+NotifyProvider notify = new NotifyProvider.Builder(TelegramClient.class, "Api Key")
         .build();
 
-notify.send(NotifyProvider.Notify.error, "channel id", "Title", "Message");
-notify.send(NotifyProvider.Notify.info, "channel id", "Title", "Message");
-notify.send(NotifyProvider.Notify.warning, "channel id", "Title", "Message");
+notify.send(NotifyLevel.error, "channel id", "Title", "Message");
+
+
+NotifyProvider notify = new NotifyProvider.Builder(TelegramClient.class, "Api Key")
+        .channel("channel id")
+        .title("Title")
+        .build();
+
+try {
+    notify.send(NotifyLevel.none, "Текст");
+} catch (NotifyRequiredException e) {
+    e.printStackTrace();
+}
+
+notify.shutdown();
 ```
 
 #### Add maven repository

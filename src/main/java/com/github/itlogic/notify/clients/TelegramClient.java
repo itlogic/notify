@@ -1,6 +1,7 @@
 package com.github.itlogic.notify.clients;
 
 
+import com.github.itlogic.notify.exceptions.NotifySendException;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -24,8 +25,8 @@ public class TelegramClient implements ClientInterface {
     private String apiKey = "";
 
     @Override
-    public final void setAuth(final String authKey) {
-        this.apiKey = authKey;
+    public final void setApiKey(final String apiKey) {
+        this.apiKey = apiKey;
     }
 
     @Override

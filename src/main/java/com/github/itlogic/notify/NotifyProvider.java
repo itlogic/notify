@@ -1,34 +1,17 @@
 package com.github.itlogic.notify;
 
 import com.github.itlogic.notify.clients.ClientInterface;
+import com.github.itlogic.notify.exceptions.NotifyRequiredException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Notification provider.
  */
 public class NotifyProvider {
-
-    /**
-     * Level notification.
-     */
-    public enum Notify {
-        /**
-         * Info.
-         */
-        info,
-
-        /**
-         * Warning.
-         */
-        warning,
-
-        /**
-         * Error.
-         */
-        error
-    }
 
     private String channelId;
     private String title;
@@ -40,7 +23,7 @@ public class NotifyProvider {
     public NotifyProvider(final Builder builder) {
         try {
             this.client = builder.client.newInstance();
-            this.client.setAuth(builder.authKey);
+            this.client.setApiKey(builder.apiKey);
             this.channelId = builder.channelId;
             this.title = builder.title;
         } catch (InstantiationException e) {
@@ -50,19 +33,28 @@ public class NotifyProvider {
         }
     }
 
-    public final void send(final Notify level, final String channel, final String title, final String message) {
+    public final void send(final NotifyLevel level, final String channel, final String title, final String message) {
         pushMessageTask(level, channel, title, message);
     }
 
-    public final void send(final Notify level, final String title, final String message) {
+    public final void send(final NotifyLevel level, final String title, final String message) throws NotifyRequiredException {
+        if (this.channelId == null || this.channelId.isEmpty()) {
+            throw new NotifyRequiredException("Channel id required");
+        }
         pushMessageTask(level, this.channelId, title, message);
     }
 
-    public final void send(final Notify level, final String message) {
+    public final void send(final NotifyLevel level, final String message) throws NotifyRequiredException {
+        if (this.channelId == null || this.channelId.isEmpty()) {
+            throw new NotifyRequiredException("Channel id required in builder");
+        }
+        if (this.title == null || this.title.isEmpty()) {
+            throw new NotifyRequiredException("Title required in builder");
+        }
         pushMessageTask(level, this.channelId, this.title, message);
     }
 
-    private void pushMessageTask(final Notify level, final String channel, final String title, final String message) {
+    private void pushMessageTask(final NotifyLevel level, final String channel, final String title, final String message) {
         switch (level) {
             case info:
                 executor.submit(new NotifyTask(client, channel, makeInfoMessage(title, message)));
@@ -74,7 +66,7 @@ public class NotifyProvider {
                 executor.submit(new NotifyTask(client, channel, makeErrorMessage(title, message)));
                 break;
             default:
-                break;
+                executor.submit(new NotifyTask(client, channel, makeCleanMessage(title, message)));
         }
     }
 
@@ -90,23 +82,23 @@ public class NotifyProvider {
         return "❕ *" + title + "* ❕️\n" + message;
     }
 
+    private String makeCleanMessage(final String title, final String message) {
+        return "*" + title + "* ️\n" + message;
+    }
+
     /**
      * Notification provider builder.
      */
     public static class Builder {
 
         private Class<? extends ClientInterface> client;
-        private String authKey = "";
+        private String apiKey = "";
         private String channelId = "";
         private String title = "";
 
-        public Builder(final Class<? extends ClientInterface> client) {
+        public Builder(final Class<? extends ClientInterface> client, String apiKey) {
             this.client = client;
-        }
-
-        public final Builder auth(final String auth) {
-            this.authKey = auth;
-            return this;
+            this.apiKey = apiKey;
         }
 
         public final Builder channel(final String channelId) {
@@ -122,5 +114,9 @@ public class NotifyProvider {
         public final NotifyProvider build() {
             return new NotifyProvider(this);
         }
+    }
+
+    public final void shutdown() {
+        executor.shutdown();
     }
 }

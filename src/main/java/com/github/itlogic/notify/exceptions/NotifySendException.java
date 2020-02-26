@@ -1,4 +1,4 @@
-package com.github.itlogic.notify.clients;
+package com.github.itlogic.notify.exceptions;
 
 /**
  * Send notification exception.
